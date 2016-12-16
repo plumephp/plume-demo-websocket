@@ -58,7 +58,7 @@ class WebSocketClient
     public function connect()
     {
         $this->socket = new \swoole_client(SWOOLE_SOCK_TCP);
-        if (!$this->socket->connect($this->host, $this->port))
+        if (!$this->socket->connect($this->host, $this->port, 1))
         {
             return false;
         }

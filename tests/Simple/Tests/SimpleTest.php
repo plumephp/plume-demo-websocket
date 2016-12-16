@@ -7,6 +7,8 @@ require_once __DIR__.'/../../../vendor/autoload.php';
 use Plume\Application;
 use Plume\Test;
 
+use Plume\Cluster;
+
 function run(){
 	// $app = new Application();
 	// $app['plume.root.path'] = __DIR__.'/../../../';// 指定根路径
@@ -34,6 +36,10 @@ function run(){
 	// 	var_dump($key);
 	// 	var_dump($value);
 	// }
+
+	// new Cluster(null,null,null);
+	echo "asdfdf\n";
+	echo 'aa';
 }
 
 run();

@@ -96,10 +96,11 @@ class Index extends Event{
         $ret->data = new \stdClass();
         $ret->data->user_name = '老子';
         $ret->data->user_id = '-1' ;
-        if (count($this->server->connections) > 0) {
-            foreach ($this->server->connections as $fd) {
-                $this->server->push($fd , json_encode($ret));
-            }
-        }
+        $this->broadcast($ret);
+        // if (count($this->server->connections) > 0) {
+        //     foreach ($this->server->connections as $fd) {
+        //         $this->server->push($fd , json_encode($ret));
+        //     }
+        // }
     }
 }

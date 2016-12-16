@@ -17,14 +17,27 @@ function run(){
 	if (!$client->connect()) {
 		echo "error";
 		echo "\n";
+		// return;
 	}
-	echo $client->connect();
+	var_dump($client->getSocket()->isConnected());
 	echo "\n";
-	echo $client->send($data);
+	// $sendd = $client->send($data);
+	$sendd = $client->send('111');
+	var_dump($sendd);
 	echo "\n";
-	$data = '{"url":"plume/cluster/ping","data":"ping"}';
+	// echo $client->recv();
+	// echo "\n";
+	// $data = '{"url":"plume/cluster/ping","data":"ping"}';
+	// echo "\n";
+	// echo $client->send($data);
+	// echo "\n";
+	// $result = $client->recv();
+	// var_dump("pingpong");
+	// var_dump($result);
+	// var_dump($result === "pingpong");
+	// echo "\n";
 	echo "\n";
-	echo $client->send($data);
+	echo "\n";
 }
 
 run();

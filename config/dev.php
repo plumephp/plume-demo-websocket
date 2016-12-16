@@ -17,11 +17,11 @@ return array(
 			'host' => '127.0.0.1',
 			'port' => '9501',
 			),
-		'slave' => array(
-				// array(
-				// 	'host' => '127.0.0.1',
-				// 	'port' => '9502',
-				// ),
+		'slaves' => array(
+				array(
+					'host' => 'localhost',
+					'port' => '9502',
+				),
 				// array(
 				// 	'host' => '127.0.0.1',
 				// 	'port' => '9503',
