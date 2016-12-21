@@ -7,7 +7,6 @@ use Plume\WebSocket\Core\Event;
 class Index extends Event{
 
 	public function index($data){
-		$fd = $this->frame->fd;
         $ret = new \stdClass();
         $ret->event = 're_bind';
         $ret->code = 0;
@@ -18,7 +17,8 @@ class Index extends Event{
             return;
         }
         $user_id = $data->user_id;
-        $config = $this->app->getConfig();
+
+        $config = $this->getConfig();
         if(empty($config['user_list'][$user_id])){
             $ret->code = -2;
             $this->replay($ret);
@@ -53,12 +53,11 @@ class Index extends Event{
         }else{
             $connect_user_list = json_decode($connect_user_list_json,true);
         }
-        $connect_user_list[$fd] = $user_id;
+        $connect_user_list[$this->fd] = $user_id;
         file_put_contents('connect_user_list.txt',json_encode($connect_user_list));
 	}
 
 	public function msg($data){
-		$fd = $this->frame->fd;
         $ret = new \stdClass();
         $ret->data = null;
         $ret->event = 're_msg';
@@ -97,10 +96,5 @@ class Index extends Event{
         $ret->data->user_name = '老子';
         $ret->data->user_id = '-1' ;
         $this->broadcast($ret);
-        // if (count($this->server->connections) > 0) {
-        //     foreach ($this->server->connections as $fd) {
-        //         $this->server->push($fd , json_encode($ret));
-        //     }
-        // }
     }
 }

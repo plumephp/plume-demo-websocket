@@ -1,3 +1,1 @@
-php web/index.php
-
-# php src/server.php
+php web/index_dev.php
