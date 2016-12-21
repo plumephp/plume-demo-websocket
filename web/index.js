@@ -14,13 +14,15 @@ function ThisPage(){
 	this.init = function(){
 		var userId = self.getQueryString('id');
 		self.userId = userId ? userId : -1;
-		self.socket = new InfobirdWS('ws://127.0.0.1:9501');
+		var wsUrl = 'ws://127.0.0.1:9501';
+		var wsList = ['ws://127.0.0.1:9501' , 'ws://127.0.0.1:9502']
+		self.socket = new InfobirdWS(wsUrl , wsList);
 		self.socket.bindOpen(self.onOpen);
-		self.socket.bindMessage(self.onMsg);
+		//self.socket.bindMessage(self.onMsg);
 		self.socket.bindClose(self.onClose);
 		self.socket.bindError(self.onError);
 		self.socket.connect();
-		// this.bindSendMsg();
+		this.bindSendMsg();
 	}
 
 	this.bindSendMsg = function(){
@@ -50,7 +52,8 @@ function ThisPage(){
 		// var fullData = {event:'bind',data:data};
 		var fullData = {url:'example/index/index',event:'bind',data:data};
 		//console.log(fullData);
-		self.socket.sendMessage(fullData);
+		//self.socket.sendMessage(fullData);
+		self.regAllEvent();
 	}
 
 	this.onMsg = function(event){
@@ -95,19 +98,42 @@ function ThisPage(){
 		}
 	}
 
-	this.execOnline = function(data){
+	this.regAllEvent = function(){
+		self.socket.regEvent('online' , self.execOnline);
+		self.socket.regEvent('re_bind' , function(fullData){
+			if(fullData.code === 0){
+				self.bindSendMsg();
+			}else if(fullData.code === -2) {
+				alert('没有该用户');
+			}else{
+				alert('登录失败');
+			}
+		});
+		self.socket.regEvent('re_msg' , function(fullData){
+			if(fullData.code !== 0){
+				alert('消息发送失败');
+			}
+		});
+		self.socket.regEvent('msg' , self.execMsg);
+		self.socket.regEvent('offline' , self.execOffline);
+	}
+
+	this.execOnline = function(fullData){
+		var data = fullData.data;
 		var old = $('#msgArea').val();
 		var content = data.user_name + '上线啦！';
 		$('#msgArea').val(old + content + '\r\n');
 	}
 
-	this.execMsg = function(data){
+	this.execMsg = function(fullData){
+		var data = fullData.data;
 		var old = $('#msgArea').val();
 		var content = data.user_name + '：' + data.content + '。';
 		$('#msgArea').val(old + content + '\r\n');
 	}
 
-	this.execOffline = function(data){
+	this.execOffline = function(fullData){
+		var data = fullData.data;
 		var old = $('#msgArea').val();
 		var content = data.user_name + '下线啦！';
 		$('#msgArea').val(old + content + '\r\n');
