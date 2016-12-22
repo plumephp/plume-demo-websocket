@@ -14,13 +14,13 @@ function ThisPage(){
 	this.init = function(){
 		var userId = self.getQueryString('id');
 		self.userId = userId ? userId : -1;
-		var wsList = ['ws://127.0.0.1:9501' , 'ws://127.0.0.1:9502']
-		self.socket = new PlumeWS('http://ws.51nhds.com:9501/wslist');
+		var wsList = ['ws://127.0.0.1:9501' , 'ws://localhost:9502']
+		self.socket = new PlumeWS(wsList);
 		self.socket.bindOpen(self.onOpen);
-		self.socket.bindMessage(self.onMsg);
+		//self.socket.bindMessage(self.onMsg);
 		self.socket.bindClose(self.onClose);
 		self.socket.bindError(self.onError);
-		self.socket.init();
+		self.socket.connect();
 		this.bindSendMsg();
 	}
 
@@ -51,7 +51,7 @@ function ThisPage(){
 		// var fullData = {event:'bind',data:data};
 		var fullData = {url:'example/index/index',event:'bind',data:data};
 		//console.log(fullData);
-		//self.socket.sendMessage(fullData);
+		self.socket.sendMessage(fullData);
 		self.regAllEvent();
 	}
 

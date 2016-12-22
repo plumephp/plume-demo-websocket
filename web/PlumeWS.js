@@ -19,7 +19,8 @@ function PlumeWS(url){
 		console.log('et ws cluster......');
 		self.ajax({
 			url : url,
-			type : 'post',
+			type : 'get',
+			datta : {},
 			dataType : 'json',
 			success : function(data){
 				self.wsList = JSON.parse(data);
@@ -121,6 +122,7 @@ function PlumeWS(url){
 
 		//连接 和 发送 - 第二步
 		if (options.type == "GET") {
+			console.log(options.url + "?" + params);
 			xhr.open("GET", options.url + "?" + params, true);
 			xhr.send(null);
 		} else if (options.type == "POST") {

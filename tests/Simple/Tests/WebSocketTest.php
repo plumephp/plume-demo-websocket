@@ -15,16 +15,11 @@ function run(){
 	$port = '9501';
 	$client = new \WebSocketClient($host, $port);
 	if (!$client->connect()) {
-		echo "error";
-		echo "\n";
-		// return;
+		echo "error\r\n";
+		return;
 	}
-	var_dump($client->getSocket()->isConnected());
-	echo "\n";
-	// $sendd = $client->send($data);
-	$sendd = $client->send('111');
-	var_dump($sendd);
-	echo "\n";
+	$sendResult = $client->send('111');
+	var_dump($sendResult);
 	// echo $client->recv();
 	// echo "\n";
 	// $data = '{"url":"plume/cluster/ping","data":"ping"}';
@@ -35,9 +30,6 @@ function run(){
 	// var_dump("pingpong");
 	// var_dump($result);
 	// var_dump($result === "pingpong");
-	// echo "\n";
-	echo "\n";
-	echo "\n";
 }
 
 run();
