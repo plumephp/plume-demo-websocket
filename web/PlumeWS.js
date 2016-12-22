@@ -19,9 +19,9 @@ function PlumeWS(url){
 		console.log('et ws cluster......');
 		self.ajax({
 			url : url,
-			type : 'get',
-			datta : {},
-			dataType : 'json',
+			data : {callback : 'success'},
+			time : 10000,
+			callback : 'success',
 			success : function(data){
 				self.wsList = JSON.parse(data);
 				self.connect();
@@ -97,41 +97,38 @@ function PlumeWS(url){
 	}
 	this.ajax = function(options) {
 		options = options || {};
-		options.type = (options.type || "GET").toUpperCase();
-		options.dataType = options.dataType || "json";
+		if (!options.url || !options.callback) {
+			throw new Error("参数不合法");
+		}
+
+		//创建 script 标签并加入到页面中
+		var callbackName = ('jsonp_' + Math.random()).replace(".", "");
+		var oHead = document.getElementsByTagName('head')[0];
+		options.data[options.callback] = callbackName;
 		var params = self.formatParams(options.data);
+		var oS = document.createElement('script');
+		oHead.appendChild(oS);
 
-		//创建 - 非IE6 - 第一步
-		if (window.XMLHttpRequest) {
-			var xhr = new XMLHttpRequest();
-		} else { //IE6及其以下版本浏览器
-			var xhr = new ActiveXObject('Microsoft.XMLHTTP');
-		}
+		//创建jsonp回调函数
+		window[callbackName] = function (json) {
+			oHead.removeChild(oS);
+			clearTimeout(oS.timer);
+			window[callbackName] = null;
+			options.success && options.success(json);
+		};
 
-		//接收 - 第三步
-		xhr.onreadystatechange = function () {
-			if (xhr.readyState == 4) {
-				var status = xhr.status;
-				if (status >= 200 && status < 300) {
-					options.success && options.success(xhr.responseText, xhr.responseXML);
-				} else {
-					options.error && options.error(status);
-				}
-			}
-		}
+		//发送请求
+		oS.src = options.url + '?' + params;
 
-		//连接 和 发送 - 第二步
-		if (options.type == "GET") {
-			console.log(options.url + "?" + params);
-			xhr.open("GET", options.url + "?" + params, true);
-			xhr.send(null);
-		} else if (options.type == "POST") {
-			xhr.open("POST", options.url, true);
-			//设置表单提交时的内容类型
-			xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-			xhr.send(params);
+		//超时处理
+		if (options.time) {
+			oS.timer = setTimeout(function () {
+				window[callbackName] = null;
+				oHead.removeChild(oS);
+				options.error && options.error({ message: "timeout" });
+			}, time);
 		}
-	}
+	};
 	//ajax格式化参数
 	this.formatParams = function(data) {
 		var arr = [];
