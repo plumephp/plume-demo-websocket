@@ -17,10 +17,10 @@ function ThisPage(){
 		var wsList = ['ws://127.0.0.1:9501' , 'ws://127.0.0.1:9502']
 		self.socket = new PlumeWS(wsList);
 		self.socket.bindOpen(self.onOpen);
-		//self.socket.bindMessage(self.onMsg);
+		self.socket.bindMessage(self.onMsg);
 		self.socket.bindClose(self.onClose);
 		self.socket.bindError(self.onError);
-		self.socket.connect();
+		self.socket.init();
 		this.bindSendMsg();
 	}
 

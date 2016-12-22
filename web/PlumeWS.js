@@ -1,21 +1,38 @@
 /*
- * wsList 备用ws列表
+ * url get ws cluster's url
  */
-function PlumeWS(wsList){
+function PlumeWS(url){
 	var self = this;
-	this.wsUrl = wsList[0];//公有属性，服务器地址
 	this.socket = null;//公有属性，原生的WebSocket对象,外部可直接使用
 
+	var wsUrl = '';//current ws url
+	var wsList = [];//公有属性，服务器地址
 	var openCb = null;//私有属性，用来接收onopen的回调
 	//var messageCb = null;//私有属性，用来接收onmessage的回调
 	var errorCb = null;//私有属性，用来接收onerror的回调
 	var closeCb = null;//私有属性，用来接收onclose的回调
 	var currentWsIndex = 0;//wsList的索引
 	var reTryCount = 0;//链接某个ws已重试次数
-	var eventList = [];
+	var eventList = {};
+
+	this.init = function(){
+		console.log('et ws cluster......');
+		self.ajax({
+			url : url,
+			type : 'post',
+			dataType : 'json',
+			success : function(data){
+				self.wsList = JSON.parse(data);
+				self.connect();
+			},
+			error : function(status){
+				console.log('get ws cluster fail , fail status:' + status);
+			}
+		});
+	}
 
 	this.connect = function(){
-		console.log('connecting......');
+		console.log('connecting ws......');
 		if(!openCb){//要求必须绑定onopen事件
 			return ;
 		}
@@ -30,8 +47,8 @@ function PlumeWS(wsList){
 					console.log('system error.error detail:' + fullData.data);
 					return;
 				}
-				if(eventList[e.data.event]){
-					eventList[e.data.event](fullData);
+				if(eventList[fullData.event]){
+					eventList[fullData.event](fullData);
 				}
 			}
 
@@ -76,5 +93,50 @@ function PlumeWS(wsList){
 	}
 	this.regEvent = function(eventName , eventCb){
 		eventList[eventName] = eventCb;
+	}
+	this.ajax = function(options) {
+		options = options || {};
+		options.type = (options.type || "GET").toUpperCase();
+		options.dataType = options.dataType || "json";
+		var params = self.formatParams(options.data);
+
+		//创建 - 非IE6 - 第一步
+		if (window.XMLHttpRequest) {
+			var xhr = new XMLHttpRequest();
+		} else { //IE6及其以下版本浏览器
+			var xhr = new ActiveXObject('Microsoft.XMLHTTP');
+		}
+
+		//接收 - 第三步
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState == 4) {
+				var status = xhr.status;
+				if (status >= 200 && status < 300) {
+					options.success && options.success(xhr.responseText, xhr.responseXML);
+				} else {
+					options.error && options.error(status);
+				}
+			}
+		}
+
+		//连接 和 发送 - 第二步
+		if (options.type == "GET") {
+			xhr.open("GET", options.url + "?" + params, true);
+			xhr.send(null);
+		} else if (options.type == "POST") {
+			xhr.open("POST", options.url, true);
+			//设置表单提交时的内容类型
+			xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+			xhr.send(params);
+		}
+	}
+	//ajax格式化参数
+	this.formatParams = function(data) {
+		var arr = [];
+		for (var name in data) {
+			arr.push(encodeURIComponent(name) + "=" + encodeURIComponent(data[name]));
+		}
+		arr.push(("v=" + Math.random()).replace(".",""));
+		return arr.join("&");
 	}
 }
