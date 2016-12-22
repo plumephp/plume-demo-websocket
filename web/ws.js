@@ -1,23 +1,22 @@
 /*
- * wsUrl ws默认地址
  * wsList 备用ws列表
  */
-function InfobirdWS(wsUrl , wsList){
+function PlumeWS(wsList){
 	var self = this;
-	this.wsUrl = wsUrl;//公有属性，服务器地址
+	this.wsUrl = wsList[0];//公有属性，服务器地址
 	this.socket = null;//公有属性，原生的WebSocket对象,外部可直接使用
 
 	var openCb = null;//私有属性，用来接收onopen的回调
 	//var messageCb = null;//私有属性，用来接收onmessage的回调
 	var errorCb = null;//私有属性，用来接收onerror的回调
 	var closeCb = null;//私有属性，用来接收onclose的回调
-	var currentWsIndex = -1;//-1表示链接默认ws，其余值为wsList的索引
-	var reTryCount = 0;//链接某个已ws重试次数
+	var currentWsIndex = 0;//wsList的索引
+	var reTryCount = 0;//链接某个ws已重试次数
 	var eventList = [];
 
 	this.connect = function(){
 		console.log('connecting......');
-		if(!openCb || !messageCb){//要求必须绑定onopen和onmessage事件
+		if(!openCb){//要求必须绑定onopen事件
 			return ;
 		}
 		//第一次或者是异常断开时都重新实例化WebSocket对象
@@ -27,8 +26,8 @@ function InfobirdWS(wsUrl , wsList){
 		self.socket.onmessage = function(e){
 			if(e && e.data){
 				var fullData = JSON.parse(e.data);
-				if(fullData.code = 500){//system error
-					console.log('system error.');
+				if(fullData.error){//system error
+					console.log('system error.error detail:' + fullData.data);
 					return;
 				}
 				if(eventList[e.data.event]){
@@ -44,8 +43,8 @@ function InfobirdWS(wsUrl , wsList){
 				if(wsList[currentWsIndex]){
 					self.wsUrl = wsList[currentWsIndex];
 				}else{
-					currentWsIndex = -1;
-					self.wsUrl = wsUrl;
+					currentWsIndex = 0;
+					self.wsUrl = wsList[0];
 				}
 				reTryCount = 0;
 			}

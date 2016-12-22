@@ -14,9 +14,8 @@ function ThisPage(){
 	this.init = function(){
 		var userId = self.getQueryString('id');
 		self.userId = userId ? userId : -1;
-		var wsUrl = 'ws://127.0.0.1:9501';
 		var wsList = ['ws://127.0.0.1:9501' , 'ws://127.0.0.1:9502']
-		self.socket = new InfobirdWS(wsUrl , wsList);
+		self.socket = new PlumeWS(wsList);
 		self.socket.bindOpen(self.onOpen);
 		//self.socket.bindMessage(self.onMsg);
 		self.socket.bindClose(self.onClose);
