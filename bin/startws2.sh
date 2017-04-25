@@ -1,1 +1,0 @@
-php web/index_cluster.php

@@ -6,13 +6,13 @@ return array(
 	),
 	'server' => array(
 		'master' => array(
-			'host' => '127.0.0.1',
-			'port' => '9501',
+			'host' => 'localhost',
+			'port' => '9502',
 			),
 		'slaves' => array(
 				array(
-					'host' => 'localhost',
-					'port' => '9502',
+					'host' => '127.0.0.1',
+					'port' => '9501',
 				),
 				// array(
 				// 	'host' => '127.0.0.1',

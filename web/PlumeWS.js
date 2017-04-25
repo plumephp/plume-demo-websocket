@@ -1,31 +1,43 @@
 /*
  * url get ws cluster's url
  */
-function PlumeWS(url){
-	var self = this;
-	this.socket = null;//公有属性，原生的WebSocket对象,外部可直接使用
 
-	var wsUrl = '';//current ws url
-	var wsList = [];//公有属性，服务器地址
+ function success(data){
+ 	window.callback(data);
+ }
+function PlumeWS(url){
+	self = this;
+	this.socket = null;//公有属性，原生的WebSocket对象,外部可直接使用
+	this.wsUrl = '';//current ws url
+	this.wsList = [];//公有属性，服务器地址
+
 	var openCb = null;//私有属性，用来接收onopen的回调
 	//var messageCb = null;//私有属性，用来接收onmessage的回调
 	var errorCb = null;//私有属性，用来接收onerror的回调
 	var closeCb = null;//私有属性，用来接收onclose的回调
-	var currentWsIndex = 0;//wsList的索引
-	var reTryCount = 0;//链接某个ws已重试次数
-	var eventList = {};
+	this.currentWsIndex = 0;//wsList的索引
+	this.reTryCount = 0;//链接某个ws已重试次数
+	this.eventList = {};
 
 	this.init = function(){
 		console.log('et ws cluster......');
+		window.callback = function (data) {
+			self.wsList = data;
+			self.currentWsIndex = (Math.ceil((data.length-1) * 10 * Math.random()) / 10).toFixed(0);
+			self.wsUrl = self.wsList[self.currentWsIndex];
+			console.log(self.wsUrl);
+			self.connect();
+		}
 		self.ajax({
 			url : url,
 			data : {callback : 'success'},
+			dataType : 'jsonp',
 			time : 10000,
 			callback : 'success',
-			success : function(data){
-				self.wsList = JSON.parse(data);
-				self.connect();
-			},
+			// success : function(data){
+			// 	self.wsList = data;
+			// 	self.connect();
+			// },
 			error : function(status){
 				console.log('get ws cluster fail , fail status:' + status);
 			}
@@ -48,29 +60,29 @@ function PlumeWS(url){
 					console.log('system error.error detail:' + fullData.data);
 					return;
 				}
-				if(eventList[fullData.event]){
-					eventList[fullData.event](fullData);
+				if(self.eventList[fullData.event]){
+					self.eventList[fullData.event](fullData);
 				}
 			}
 
 		}
 		self.socket.onerror = errorCb;
 		var closeCbWrap = function(e){//执行外部绑定的onclose事件并自动重连
-			if(reTryCount > 3){
-				currentWsIndex++;
-				if(wsList[currentWsIndex]){
-					self.wsUrl = wsList[currentWsIndex];
+			if(self.reTryCount > 3){
+				self.currentWsIndex++;
+				if(self.wsList[self.currentWsIndex]){
+					self.wsUrl = self.wsList[self.currentWsIndex];
 				}else{
-					currentWsIndex = 0;
-					self.wsUrl = wsList[0];
+					self.currentWsIndex = 0;
+					self.wsUrl = self.wsList[0];
 				}
-				reTryCount = 0;
+				self.reTryCount = 0;
 			}
 			if(closeCb){
 				closeCb(e);
 			}
 			self.connect();//重连
-			reTryCount++;
+			self.reTryCount++;
 		}
 		self.socket.onclose = closeCbWrap;
 	}
@@ -93,7 +105,7 @@ function PlumeWS(url){
 		}
 	}
 	this.regEvent = function(eventName , eventCb){
-		eventList[eventName] = eventCb;
+		self.eventList[eventName] = eventCb;
 	}
 	this.ajax = function(options) {
 		options = options || {};
@@ -125,8 +137,8 @@ function PlumeWS(url){
 			oS.timer = setTimeout(function () {
 				window[callbackName] = null;
 				oHead.removeChild(oS);
-				options.error && options.error({ message: "timeout" });
-			}, time);
+				options.fail && options.fail({ message: "timeout" });
+			}, options.time);
 		}
 	};
 	//ajax格式化参数
@@ -135,7 +147,6 @@ function PlumeWS(url){
 		for (var name in data) {
 			arr.push(encodeURIComponent(name) + "=" + encodeURIComponent(data[name]));
 		}
-		arr.push(("v=" + Math.random()).replace(".",""));
 		return arr.join("&");
 	}
 }
