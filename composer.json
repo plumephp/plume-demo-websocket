@@ -1,15 +1,15 @@
 {
-    "name": "plumephp/websocket",
+    "name": "plumephp/websocket-demo",
     "type": "library",
     "license": "BSD-2-Clause",
     "minimum-stability": "dev",
     "require": {
+        "plumephp/plume":"dev-master",
+        "plumephp/websocket":"dev-master"
     },
     "autoload": {
         "psr-4": {
-            "": "modules/",
-            "Plume\\": ["/Users/zhangtao/Documents/plumephp2016/plume/src/Plume","/Users/zhangtao/Documents/plumephp2016/websocket/modules/Plume/"],
-            "Plume\\WebSocket\\": "/Users/zhangtao/Documents/plumephp2016/websocket/src/"
+            "": "modules/"
         }
     }
 }

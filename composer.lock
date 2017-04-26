@@ -1,0 +1,129 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "db6440a9878774c332ab11e3125dc550",
+    "content-hash": "8217ff0342e948864d5dac4e44d5ba39",
+    "packages": [
+        {
+            "name": "joshcam/mysqli-database-class",
+            "version": "v2.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/joshcam/PHP-MySQLi-Database-Class.git",
+                "reference": "0595c669e6883adaad1b3285b166fd9f58fd6acd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://packagist.phpcomposer.com/files/joshcam/PHP-MySQLi-Database-Class/0595c669e6883adaad1b3285b166fd9f58fd6acd.zip",
+                "reference": "0595c669e6883adaad1b3285b166fd9f58fd6acd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "MysqliDb.php",
+                    "dbObject.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Josh Campbell",
+                    "email": "josh.lee.campbell@gmail.com",
+                    "homepage": "https://github.com/joshcam",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Alexander V. Butenko",
+                    "email": "a.butenka@gmail.com",
+                    "homepage": "http://smarttechdo.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP MySQL Wrapper and object mapper which utilizes MySQLi and prepared statements",
+            "time": "2016-11-18 16:16:21"
+        },
+        {
+            "name": "plumephp/plume",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/plumephp/plume.git",
+                "reference": "19079edb5f62fb3f31b39cb484c0bcac54c0eccc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://files.phpcomposer.com/files/plumephp/plume/19079edb5f62fb3f31b39cb484c0bcac54c0eccc.zip",
+                "reference": "19079edb5f62fb3f31b39cb484c0bcac54c0eccc",
+                "shasum": ""
+            },
+            "require": {
+                "joshcam/mysqli-database-class": "^2.7"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "5.5.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Plume\\": "src/Plume"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "description": "A micro framework for PHP.",
+            "time": "2017-04-24 03:29:56"
+        },
+        {
+            "name": "plumephp/websocket",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/plumephp/websocket.git",
+                "reference": "a0c20f69588e7d0b9b476f15ba79bab8fd89b5bd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://files.phpcomposer.com/files/plumephp/websocket/a0c20f69588e7d0b9b476f15ba79bab8fd89b5bd.zip",
+                "reference": "a0c20f69588e7d0b9b476f15ba79bab8fd89b5bd",
+                "shasum": ""
+            },
+            "require": {
+                "plumephp/plume": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Plume\\WebSocket\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "time": "2017-04-25 03:01:42"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "plumephp/plume": 20,
+        "plumephp/websocket": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}
