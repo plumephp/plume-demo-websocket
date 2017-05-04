@@ -13,7 +13,7 @@ function ChatRoom(){
 		var userId = self.getQueryString('id');
 		self.userId = userId ? userId : -1;
 		//连接socket
-		self.socket = new PlumeWS('http://127.0.0.1:9501/wslist');
+		self.socket = new PlumeWS(url_wslist);
 		//绑定socket事件
 		self.socket.bindOpen(self.onOpen);
 		self.socket.bindClose(self.onClose);
