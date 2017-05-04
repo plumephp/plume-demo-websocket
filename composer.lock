@@ -91,12 +91,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/plumephp/websocket.git",
-                "reference": "a0c20f69588e7d0b9b476f15ba79bab8fd89b5bd"
+                "reference": "1a38f18d1a1f6b69c112b6eb11b3d6991141e0b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://files.phpcomposer.com/files/plumephp/websocket/a0c20f69588e7d0b9b476f15ba79bab8fd89b5bd.zip",
-                "reference": "a0c20f69588e7d0b9b476f15ba79bab8fd89b5bd",
+                "url": "https://files.phpcomposer.com/files/plumephp/websocket/1a38f18d1a1f6b69c112b6eb11b3d6991141e0b8.zip",
+                "reference": "1a38f18d1a1f6b69c112b6eb11b3d6991141e0b8",
                 "shasum": ""
             },
             "require": {
@@ -105,14 +105,15 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Plume\\WebSocket\\": "src/"
+                    "Plume\\WebSocket\\": "src/",
+                    "PlumeWSService\\": "modules/PlumeWSService/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-2-Clause"
             ],
-            "time": "2017-04-25 03:01:42"
+            "time": "2017-05-03 08:27:05"
         }
     ],
     "packages-dev": [],

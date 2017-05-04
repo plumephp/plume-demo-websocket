@@ -8,7 +8,7 @@
         "plumephp/websocket":"dev-master"
     },
     "autoload": {
-        "psr-4": {
+         "psr-4": {
             "": "modules/"
         }
     }
