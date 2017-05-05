@@ -30,7 +30,7 @@ class Index extends Event{
         $user_name = $config['user_list'][$user_id];
         $bind_value = new \stdClass();
         $bind_value->user_name = $user_name;
-        $this->bind(json_encode($bind_value));
+        $this->bind("", json_encode($bind_value));
         //通知终端绑定完毕
         $ret->code = 0;
         $this->replay($ret);
