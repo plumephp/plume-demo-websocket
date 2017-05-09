@@ -8,7 +8,7 @@ return array(
     //本机WebSocket服务配置
     'server_config' => array(
         'allow_ip' => '0.0.0.0',
-        'host' => '127.0.0.1',
+        'host' => 'localhost',
         'port' => '9502',
     ),
     //WebSocket集群其它节点配置

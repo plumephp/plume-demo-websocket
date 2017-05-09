@@ -1,18 +1,15 @@
 /*
  * url get ws cluster's url
  */
+function PlumeWS(urls){
+	  self = this;
+    this.wsListConfig = urls;
+	  this.socket = null;//公有属性，原生的WebSocket对象,外部可直接使用
+	  this.wsUrl = '';//current ws url
+	  this.wsList = [];//公有属性，服务器地址
 
- function success(data){
- 	window.callback(data);
- }
-function PlumeWS(url){
-	self = this;
-	this.socket = null;//公有属性，原生的WebSocket对象,外部可直接使用
-	this.wsUrl = '';//current ws url
-	this.wsList = [];//公有属性，服务器地址
-
-	var openCb = null;//私有属性，用来接收onopen的回调
-	//var messageCb = null;//私有属性，用来接收onmessage的回调
+	  var openCb = null;//私有属性，用来接收onopen的回调
+	  //var messageCb = null;//私有属性，用来接收onmessage的回调
 	var errorCb = null;//私有属性，用来接收onerror的回调
 	var closeCb = null;//私有属性，用来接收onclose的回调
 	this.currentWsIndex = 0;//wsList的索引
@@ -20,28 +17,13 @@ function PlumeWS(url){
 	this.eventList = {};
 
 	this.init = function(){
-		console.log('et ws cluster......');
-		window.callback = function (data) {
-			self.wsList = data;
-			self.currentWsIndex = (Math.ceil((data.length-1) * 10 * Math.random()) / 10).toFixed(0);
+		  console.log('et ws cluster......');
+			self.wsList = self.wsListConfig.split("|");
+      console.log(self.wsList);
+			self.currentWsIndex = (Math.ceil((self.wsList.length-1) * 10 * Math.random()) / 10).toFixed(0);
 			self.wsUrl = self.wsList[self.currentWsIndex];
 			console.log(self.wsUrl);
 			self.connect();
-		}
-		self.ajax({
-			url : url,
-			data : {callback : 'success'},
-			dataType : 'jsonp',
-			time : 10000,
-			callback : 'success',
-			// success : function(data){
-			// 	self.wsList = data;
-			// 	self.connect();
-			// },
-			error : function(status){
-				console.log('get ws cluster fail , fail status:' + status);
-			}
-		});
 	}
 
 	this.connect = function(){
