@@ -12,12 +12,12 @@ return array(
         'port' => '9501',
     ),
     //WebSocket集群其它节点配置
-    //'cluster_nodes' => array(
+    'cluster_nodes' => array(
     //    array(
     //        'host' => '127.0.0.1',
     //        'port' => '9502'
     //    ),
-    //),
+    ),
     //Swoole服务配置
 	'swoole_config' => array(
 			'timeout' => 2.5,  //select and epoll_wait timeout.
