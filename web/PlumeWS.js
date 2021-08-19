@@ -1,134 +1,129 @@
 /*
  * url get ws cluster's url
+ * heartbeatTime is interval time that test is not can receive ws event
  */
-function PlumeWS(urls){
-	  self = this;
-    this.wsListConfig = urls;
-	  this.socket = null;//公有属性，原生的WebSocket对象,外部可直接使用
-	  this.wsUrl = '';//current ws url
-	  this.wsList = [];//公有属性，服务器地址
+function PlumeWS(urls , heartbeatTime){
+	var plume = this;
+	this.wsListConfig = urls;
+	this.plumeSocket = null;//公有属性，原生的WebSocket对象,外部可直接使用
+	this.wsUrl = '';//current ws url
+	this.wsList = [];//公有属性，服务器地址
 
-	  var openCb = null;//私有属性，用来接收onopen的回调
-	  //var messageCb = null;//私有属性，用来接收onmessage的回调
+	var openCb = null;//私有属性，用来接收onopen的回调
+	//var messageCb = null;//私有属性，用来接收onmessage的回调
 	var errorCb = null;//私有属性，用来接收onerror的回调
 	var closeCb = null;//私有属性，用来接收onclose的回调
+
+	this.timeout = 2000; //2秒一次心跳
+	this.lockReconnect = false; //是否真正建立连接
+	this.timeoutObj = null; //心跳心跳倒计时
+	this.serverTimeoutObj = null; //心跳倒计时
+	this.timeoutnum = null; //断开 重连倒计时
+
 	this.currentWsIndex = 0;//wsList的索引
-	this.reTryCount = 0;//链接某个ws已重试次数
 	this.eventList = {};
+	this.messageCb = null; //用来接收onmessage的回调,这里为了兼容老版本的写法
 
 	this.init = function(){
-		  console.log('et ws cluster......');
-			self.wsList = self.wsListConfig.split("|");
-      console.log(self.wsList);
-			self.currentWsIndex = (Math.ceil((self.wsList.length-1) * 10 * Math.random()) / 10).toFixed(0);
-			self.wsUrl = self.wsList[self.currentWsIndex];
-			console.log(self.wsUrl);
-			self.connect();
-	}
+		console.log('et ws cluster......');
+		plume.wsList = plume.wsListConfig.split("|");
+		console.log(plume.wsList);
+		plume.currentWsIndex = (Math.ceil((plume.wsList.length-1) * 10 * Math.random()) / 10).toFixed(0);
+		plume.wsUrl = plume.wsList[plume.currentWsIndex];
+		console.log(plume.wsUrl);
+		plume.connect();
+	};
 
 	this.connect = function(){
-		console.log('connecting ws......');
-		if(!openCb){//要求必须绑定onopen事件
-			return ;
-		}
 		//第一次或者是异常断开时都重新实例化WebSocket对象
-		self.socket =  new WebSocket(self.wsUrl);
-		self.socket.onopen = openCb;
-		//self.socket.onmessage = messageCb;
-		self.socket.onmessage = function(e){
+		plume.plumeSocket =  new WebSocket(plume.wsUrl);
+		plume.plumeSocket.onopen = openCb;
+		plume.heartbeatTest(); // 开启心跳
+		plume.plumeSocket.onmessage = function(e){
 			if(e && e.data){
-				var fullData = JSON.parse(e.data);
-				if(fullData.error){//system error
-					console.log('system error.error detail:' + fullData.data);
-					return;
-				}
-				if(self.eventList[fullData.event]){
-					self.eventList[fullData.event](fullData);
-				}
-			}
-
-		}
-		self.socket.onerror = errorCb;
-		var closeCbWrap = function(e){//执行外部绑定的onclose事件并自动重连
-			if(self.reTryCount > 3){
-				self.currentWsIndex++;
-				if(self.wsList[self.currentWsIndex]){
-					self.wsUrl = self.wsList[self.currentWsIndex];
+				if(e.data == 'pingpong'){//处理心跳接收事件
+					
 				}else{
-					self.currentWsIndex = 0;
-					self.wsUrl = self.wsList[0];
+					var fullData = JSON.parse(e.data);
+					if(plume.eventList[fullData.event]){
+						plume.eventList[fullData.event](fullData);
+					}else if(plume.messageCb){//兼容老版本的写法
+						plume.messageCb(fullData);
+					}
 				}
-				self.reTryCount = 0;
 			}
-			if(closeCb){
-				closeCb(e);
-			}
-			self.connect();//重连
-			self.reTryCount++;
-		}
-		self.socket.onclose = closeCbWrap;
-	}
-
+			plume.reset();  //收到服务器信息，心跳重置
+		};
+		plume.plumeSocket.onerror = function(e){
+			plume.reconnect();
+		};
+		plume.plumeSocket.onclose = function(e){
+			plume.reconnect();
+		};
+	};
+	this.reset = function(){
+		//重置心跳
+		//清除时间
+		clearTimeout(plume.timeoutObj);
+		clearTimeout(plume.serverTimeoutObj);
+		//重启心跳
+		plume.heartbeatTest(); 
+	};
 	this.bindOpen = function(cb){//接收onopen的回调
 		openCb = cb;
-	}
+	};
 	this.bindMessage = function(cb){//接收onmessage的回调
-		messageCb = cb;
-	}
+		plume.messageCb = cb;
+	};
 	this.bindError = function(cb){//接收onerror的回调
 		errorCb = cb;
-	}
+	};
 	this.bindClose = function(cb){//接收onclose的回调
 		closeCb = cb;
-	}
+	};
 	this.sendMessage = function(data){//发送消息的方法
-		if(self.socket){
-			self.socket.send(JSON.stringify(data));
-		}
-	}
-	this.regEvent = function(eventName , eventCb){
-		self.eventList[eventName] = eventCb;
-	}
-	this.ajax = function(options) {
-		options = options || {};
-		if (!options.url || !options.callback) {
-			throw new Error("参数不合法");
-		}
-
-		//创建 script 标签并加入到页面中
-		var callbackName = ('jsonp_' + Math.random()).replace(".", "");
-		var oHead = document.getElementsByTagName('head')[0];
-		options.data[options.callback] = callbackName;
-		var params = self.formatParams(options.data);
-		var oS = document.createElement('script');
-		oHead.appendChild(oS);
-
-		//创建jsonp回调函数
-		window[callbackName] = function (json) {
-			oHead.removeChild(oS);
-			clearTimeout(oS.timer);
-			window[callbackName] = null;
-			options.success && options.success(json);
-		};
-
-		//发送请求
-		oS.src = options.url + '?' + params;
-
-		//超时处理
-		if (options.time) {
-			oS.timer = setTimeout(function () {
-				window[callbackName] = null;
-				oHead.removeChild(oS);
-				options.fail && options.fail({ message: "timeout" });
-			}, options.time);
+		if(plume.plumeSocket){
+			plume.plumeSocket.send(JSON.stringify(data));
 		}
 	};
-	//ajax格式化参数
-	this.formatParams = function(data) {
-		var arr = [];
-		for (var name in data) {
-			arr.push(encodeURIComponent(name) + "=" + encodeURIComponent(data[name]));
+	this.regEvent = function(eventName , eventCb){
+		plume.eventList[eventName] = eventCb;
+	};
+	this.heartbeatTest = function(){
+		//开启心跳
+		plume.timeoutObj && clearTimeout(plume.timeoutObj);
+		plume.serverTimeoutObj && clearTimeout(plume.serverTimeoutObj);
+		plume.timeoutObj = setTimeout(function () {
+		//这里发送一个心跳，后端收到后，返回一个心跳消息
+		if (plume.plumeSocket.readyState == 1) {
+			//如果连接正常
+			var fullData = {
+				url: 'plumeWSService/cluster/ping',
+				data: 'ping'
+			};
+			plume.plumeSocket.send(JSON.stringify(fullData));
+		} else {
+			//否则重连
+			plume.reconnect();
 		}
-		return arr.join("&");
+		plume.serverTimeoutObj = setTimeout(function () {
+			//超时关闭
+		   plume.plumeSocket.close();
+		}, plume.timeout);
+		}, plume.timeout);
+	};
+	this.reconnect = function(){
+		console.log('重连');
+		if(plume.lockReconnect){ //是否真正建立连接
+			return;
+		}else{
+			plume.lockReconnect = true;
+			//没连接上会一直重连，设置延迟避免请求过多
+			plume.timeoutnum && clearTimeout(plume.timeoutnum);
+			plume.timeoutnum = setTimeout(function () {
+				plume.init();
+				plume.lockReconnect = false;
+			},5000)
+		}
 	}
 }
